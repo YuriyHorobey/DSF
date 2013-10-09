@@ -5,13 +5,18 @@ namespace engine;
 use engine\utils\SU;
 
 class VH {
+	static function baseTag() {
+		echo '<base href="';
+		VH::url ( "" );
+		echo '" />';
+	}
 	static function place($name) {
 		$currentText = ob_get_clean ();
 		RE::addViewNode ( RE::TEXT, $currentText );
 		RE::addViewNode ( RE::PLACE, $name );
 		ob_start ();
 	}
-	static function contentFor($name) {
+	static function contentFor($name, $content) {
 	}
 	static function url($url) {
 		$url = trim ( $url );
@@ -22,7 +27,7 @@ class VH {
 	static function urlModule($url) {
 		$url = trim ( $url );
 		$url = SU::ensureBeginning ( $url, '/' );
-		echo APP_URL .'module'. $url;
+		echo APP_URL . 'module' . $url;
 	}
 	static function linkJS($url) {
 		if (func_num_args () > 1) {

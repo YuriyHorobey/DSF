@@ -34,8 +34,10 @@ class SU {
 		$ret = "";
 		$in = preg_split ( "/_+/", $in );
 		foreach ( $in as $i ) {
-			$i [0] = strtoupper ( $i [0] );
-			$ret .= $i;
+			if (strlen ( $i ) > 0) {
+				$i [0] = strtoupper ( $i [0] );
+				$ret .= $i;
+			}
 		}
 		return $ret;
 	}

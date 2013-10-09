@@ -1,1 +1,0 @@
-<?php return array("key1"=>"df", "kkk"=>999);?>

@@ -19,6 +19,7 @@ class Base {
 	protected $table;
 	public function __construct() {
 		$this->table = $this->getDefaultTable ();
+		$this->field ( 'id' )->integer ()->numRange ( 1, null );
 	}
 	public function getDefaultTable() {
 		$class = SU::underscore ( str_replace ( 'app\\models\\', '', get_class ( $this ) ) );
@@ -34,7 +35,7 @@ class Base {
 		if ($prefix) {
 			$table = $prefix . '_' . $table;
 		}
-		dbg ( $table );
+		
 		return $table;
 	}
 	protected function field($field_name) {
@@ -45,6 +46,11 @@ class Base {
 	}
 	public function getFieldNames() {
 		$ret = array_keys ( $this->fileds );
+		return $ret;
+	}
+	public function getFieldNamesAsString() {
+		$ret = array_keys ( $this->fileds );
+		$ret = implode ( ', ', $ret );
 		return $ret;
 	}
 	public function validate($return_at_first_failure = false) {
@@ -111,13 +117,14 @@ class Base {
 	public function getData() {
 		return $this->rows;
 	}
-	public function lst($start = 0, $limit = 50) {
+	public function lst($where = null, array $where_args = array(), $start = 0, $limit = 50) {
 		$this->clearErrors ();
-		$sql = 'SELECT ' . $this->getFieldNames () . ' FROM ' . $this->table;
+		$sql = 'SELECT ' . $this->getFieldNamesAsString () . ' FROM ' . $this->table;
+		dbg ( $sql );
 	}
 	public function show($id) {
 		$this->clearErrors ();
-		$sql = 'SELECT ' . implode ( ',', $this->getFieldNames () ) . ' FROM ' . $this->table . ' WHERE id=:id';
+		$sql = 'SELECT ' . $this->getFieldNamesAsString () . ' FROM ' . $this->table . ' WHERE id=:id';
 		$res = DB::exec ( $sql, array (
 				':id' => $id 
 		) );

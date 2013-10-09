@@ -6,8 +6,8 @@ use engine\utils\AU;
 
 class Base {
 	protected $viewOptions = array (
-			"master" => "application",
-			"template" => "_" 
+			"master" => "main",
+			"template" => "_"
 	);
 	protected function renderMaster($master) {
 		AU::set ( $this->viewOptions, "master", $master );

@@ -3,7 +3,7 @@
 /**
  * Global modules.
  * 
- * Modules available for each DF based application.
+ * Modules available for each DSF based application.
  */
 namespace modules;
 

@@ -6,14 +6,14 @@ use engine\utils\AU;
 
 /**
  * Class to access configuration files.
- * 
+ *
  * @author Yuriy
- *        
+ *
  */
 class CFG {
 	/**
 	 * Stores all configuration settings.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected static $cfg = array ();
@@ -22,23 +22,26 @@ class CFG {
 	 * If {@link CFG::$cfg $cfg field} already contained something, values from
 	 * the new config array will replace the existing ones (think
 	 * array_replace_recursive()).
-	 * 
-	 * @param string $path        	
+	 *
+	 * @param string $path
 	 * @return boolean
 	 */
 	static function load($path) {
 		if (file_exists ( $path )) {
 			$c = require_once $path;
-			self::$cfg = array_replace_recursive ( self::$cfg, $c );
-			return true;
-		} else {
-			return false;
+			if (is_array ( $c )) {
+				self::$cfg = array_replace_recursive ( self::$cfg, $c );
+				return true;
+			}
 		}
+		return false;
 	}
 	/**
 	 * Returns value from accumulated config settings.
+	 *
 	 * @param string $path
-	 * @param mied $def default value
+	 * @param mied $def
+	 *        	default value
 	 * @return mixed either value under <code>$path</code> or <code>$def</code>
 	 * @see AU
 	 */
@@ -48,8 +51,11 @@ class CFG {
 	}
 	/**
 	 * Sets value into configs.
-	 * @param string $path in the config array
-	 * @param mixed $value to be set
+	 *
+	 * @param string $path
+	 *        	in the config array
+	 * @param mixed $value
+	 *        	to be set
 	 * @see AU
 	 */
 	static function set($path, $value) {

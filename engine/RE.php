@@ -21,7 +21,7 @@ class RE {
 		$controllerContent = ob_get_clean ();
 		$opt = $controllerObj->getViewOptions ();
 		$haveMaster = false;
-		if (\DF::isRegularRequest ()) {
+		if (\DSF::isRegularRequest ()) {
 			// load master if any
 			$master = AU::get ( $opt, "master", '_' );
 			if ((! is_null ( $master )) && $master !== false) {
@@ -31,7 +31,7 @@ class RE {
 					$master = SU::removeBeginning ( trim ( $master ), '/' );
 				}
 				ob_start ();
-				\DF::loadPHP ( 'app/views/layouts/' . $master );
+				\DSF::loadPHP ( 'app/views/layouts/' . $master );
 				$masterContent = ob_get_clean ();
 				self::addViewNode ( self::TEXT, $masterContent );
 				$haveMaster = true;
@@ -72,7 +72,7 @@ class RE {
 			
 			$template = $path . "/" . $template;
 			ob_start ();
-			$res = \DF::loadPHP ( $template );
+			$res = \DSF::loadPHP ( $template );
 			if ($res === false) {
 				throw new \E500 ( 'Template: "' . $template . '" is not found.' );
 			}
@@ -107,7 +107,7 @@ class RE {
 		}
 	}
 	static function renderError($code, $message = "") {
-		$res = \DF::loadPHP ( "/app/views/system/" . $code, true, array (
+		$res = \DSF::loadPHP ( "/app/views/system/" . $code, true, array (
 				'message' => $message 
 		) );
 		if (! $res) {

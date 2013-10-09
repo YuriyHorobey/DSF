@@ -16,7 +16,7 @@ class ATZ {
 		if (self::$initialized) {
 			return;
 		}
-		\DF::loadPHP ( 'app/config/atz_rules' );
+		\DSF::loadPHP ( 'app/config/atz_rules' );
 		self::$initialized = true;
 	}
 	public static function defaultAnswerIs($answer) {

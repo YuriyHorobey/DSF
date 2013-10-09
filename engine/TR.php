@@ -109,7 +109,7 @@ class TR {
 	 * 		-- if you stated in config file that "some-Code" is available, -- TR respects that, so 
 	 * 		-- first translate everything, then put it under "available"
 	 * </li>
-	 * <li>Attempt to load dictionary using {@link DF::loadPHP()}.</li>
+	 * <li>Attempt to load dictionary using {@link DSF::loadPHP()}.</li>
 	 * <li>Store the language code (just as told above -- case sensitive, exactly as specified in the config) into the session</li>
 	 * </ol>
 	 * The initialization happens only once per request. Although this method is public -- you do not need to call it explicitly -- every method has 
@@ -190,7 +190,7 @@ class TR {
 		$_SESSION ['_lang'] = self::$code;
 		// load the dictianary
 		dbg ( '/app/config/locales' . self::getCodeAsPath (), 'LOADING DICT' );
-		self::$dict = \DF::loadPHP ( '/app/config/locales' . self::getCodeAsPath () );
+		self::$dict = \DSF::loadPHP ( '/app/config/locales' . self::getCodeAsPath () );
 		
 		self::$initialized = true;
 	}
