@@ -87,7 +87,18 @@ class DSF {
 		try {
 			self::init ();
 			/*
-			 * lets figure out controller cass / method There are few options 1. We use regular controller (no module) So the path can be /c/m where c is controller (maybe with namespace /separators: . or -/) and 'm' is a method. Both can be optional. So '/' => home/index, '/test' => test/index. Then the controller must be in /app/controllers/{maybe NS/}SomethingController the ending Controller is mandatory. Methods must start with 'do' and must be public. underscoers to CamelCase! So /my/something => /app/controllers/MyController::doSomething() 2. the first part is 'modules' like /modules/name/c/m -- same rules but initial namespace will be modules/name/controllers. in this case the second part (the /name/) is mandatory otherwise =>404
+			 * lets figure out controller cass / method There are few options 1.
+			 * We use regular controller (no module) So the path can be /c/m
+			 * where c is controller (maybe with namespace /separators: . or -/)
+			 * and 'm' is a method. Both can be optional. So '/' => home/index,
+			 * '/test' => test/index. Then the controller must be in
+			 * /app/controllers/{maybe NS/}SomethingController the ending
+			 * Controller is mandatory. Methods must start with 'do' and must be
+			 * public. underscoers to CamelCase! So /my/something =>
+			 * /app/controllers/MyController::doSomething() 2. the first part is
+			 * 'modules' like /modules/name/c/m -- same rules but initial
+			 * namespace will be modules/name/controllers. in this case the
+			 * second part (the /name/) is mandatory otherwise =>404
 			 */
 			$path = $_SERVER ['REQUEST_URI'];
 			$path = substr ( $path, strlen ( APP_URL ) );
@@ -116,7 +127,10 @@ class DSF {
 					$method = AU::get ( $path, '3', 'index' );
 				} else {
 					$controller = AU::get ( $path, '0', 'home' );
-					$method = AU::get ( $path, '1', 'index' );
+					$method = AU::get ( $path, '1' );
+					if (SU::isBlank ( $method )) {
+						$method = 'index';
+					}
 				}
 			}
 			
@@ -169,7 +183,7 @@ class DSF {
 		} catch ( E404 $e ) {
 			RE::renderError ( 404, $e->getMessage () );
 		} catch ( Exception $e ) {
-			dbg ( $e , 'DSF in PANIC!');
+			dbg ( $e, 'DSF in PANIC!' );
 		}
 	}
 	/**

@@ -126,7 +126,7 @@ class Base {
 			$args ['_start'] = $start;
 			$args ['_limit'] = $limit;
 		}
-		dbg ( $sql );
+		// dbg ( $sql );
 		$ret = DB::exec ( $sql, $args );
 		return $ret;
 	}
