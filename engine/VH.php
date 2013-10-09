@@ -3,8 +3,11 @@
 namespace engine;
 
 use engine\utils\SU;
+use engine\helpers\view\LST;
+use engine\utils\AU;
 
 class VH {
+	protected static $data = array ();
 	static function baseTag() {
 		echo '<base href="';
 		VH::url ( "" );
@@ -15,6 +18,9 @@ class VH {
 		RE::addViewNode ( RE::TEXT, $currentText );
 		RE::addViewNode ( RE::PLACE, $name );
 		ob_start ();
+	}
+	static function contentHere() {
+		self::place ( 'content' );
 	}
 	static function contentFor($name, $content) {
 	}
@@ -60,6 +66,19 @@ class VH {
 			$args = SU::ensureEnding ( $args, '.css' );
 			echo '<link type="text/css" media="all" rel="stylesheet" href="' . $args . '">' . "\n";
 		}
+	}
+	static function LST($name = null) {
+		return new LST ( $name );
+	}
+	static function dget($path, $def = '') {
+		$ret = AU::get ( self::$data, $path, $def );
+		return $ret;
+	}
+	static function dout($path, $def = '') {
+		echo self::dget ( $path, $def );
+	}
+	static function dset($path, $value) {
+		AU::set ( self::$data, $path, $value );
 	}
 }
 

@@ -4,14 +4,14 @@ namespace engine\utils;
 
 /**
  * Utility class to handle arrays.
- * 
- * @author Yuriy
  *
+ * @author Yuriy
+ *        
  */
 class AU {
 	/**
 	 * Checks if <code>$arr</code> is an array or creates new array; optionally fills it with elements.
-	 *<p>
+	 * <p>
 	 * First of all: if <code>$arr</code> is not an array (is null or arbitrary other data type) -- it will be converted to the array.</p>
 	 * <p>
 	 * The argument <code>$arr</code> can only be a variable (because passed by reference)</p>
@@ -33,11 +33,11 @@ class AU {
 	
 	/**
 	 * Checks if <code>$arr</code> is array and has at least one element.
-	 * 
+	 *
 	 * Method is safe agains arbitrary input: <code>null</code>-s, variables of arbitrary types -- all is allowed.<br>
 	 * Returns false only in case when <code>$arr</code> is an array and has at least one element.
-	 * 
-	 * @param array $arr
+	 *
+	 * @param array $arr        	
 	 * @return boolean
 	 */
 	static function isEmpty(array &$arr) {
@@ -45,7 +45,7 @@ class AU {
 	}
 	/**
 	 * Walks the <code>$arr</code> and applies {@link SU::isBlank} to each element.
-	 * 
+	 *
 	 * First of all check if <code>$arr</code> is not {@link isEmpty() empty} (if it is -- instantly returns true), then walks the array and checks if elements are not blanks.<br>
 	 * Returns false as soon as a first element is either object or not {@link SU::isBlank a blank string}.<br>
 	 * Since {@link SU::isBlank} is used to check, every element but Object will be casted to string.
@@ -58,7 +58,7 @@ class AU {
 			return true;
 		}
 		foreach ( $arr as $e ) {
-			if (is_object ( $e ) || ! SU::isBlank ( $e )) {
+			if (! is_null ( $e ) || ! SU::isBlank ( $e )) {
 				return false;
 			}
 		}
@@ -68,19 +68,19 @@ class AU {
 	/**
 	 * Sets value to arbitrary nested array.
 	 * <p>
-	 * Takes <code>$data</code> array, 
+	 * Takes <code>$data</code> array,
 	 * creates (if needed) as many nested arrays as defined in <code>$path</code> then sets <code>$value</code> to the last part of the <code>path</code>.
 	 * </p>
 	 * <p>In details:<br>
 	 * you have an array:
 	 * <pre>
-		$a = array (
-			'key1' => array (
-					'key11' => 111
-			) 
-		);
+	 * $a = array (
+	 * 'key1' => array (
+	 * 'key11' => 111
+	 * )
+	 * );
 	 * </pre>
-	 * and you want to have 
+	 * and you want to have
 	 * <pre>
 	 * $a['key1']['key11']['key111']='something';
 	 * //and
@@ -90,7 +90,7 @@ class AU {
 	 * <ol>
 	 * <li>Rare one: something on the path <code>['key1']['key11']['key111']</code> is already set and is not an array.<br>
 	 * You don't care of this and want it to be overriden, but PHP will complain at this point (in our case on 'key11'):<br>
-	 * <b>Warning</b>:  Cannot use a scalar value as an array in ...<br>
+	 * <b>Warning</b>: Cannot use a scalar value as an array in ...<br>
 	 * </li>
 	 * <li>Often you don't know the path <code>['key1']['key11']['key111']</code> at the design time.<br>
 	 * For example you are reading from XML file and convertig it to the nested associative array.<br>
@@ -99,11 +99,11 @@ class AU {
 	 * </ol>
 	 * Use <code>AU::set('key1/key11/key111', 'something');</code> and be happy.<br>
 	 * The parts of the path are separated with '/' and each part is <a href="http://php.net/trim" target="_blank">trim()</a>-med.
-	 * So there is no difference between 'key1/key11/key111' and 'key1   / key11 / key111'
-	 * 
-	 * @param array $data
-	 * @param string $path
-	 * @param mixed $value
+	 * So there is no difference between 'key1/key11/key111' and 'key1 / key11 / key111'
+	 *
+	 * @param array $data        	
+	 * @param string $path        	
+	 * @param mixed $value        	
 	 */
 	static function set(array &$data, $path, $value) {
 		$parts = explode ( "/", $path );
@@ -122,14 +122,14 @@ class AU {
 	
 	/**
 	 * Searches arbitrary nested array for <code>$path</code> and either returns value or <code>$def</code>.
-	 * 
+	 *
 	 * Suppose you have an array:
-	 *<pre>
-		$a = array (
-			'key1' => array (
-					'key11' => 111
-			) 
-		);
+	 * <pre>
+	 * $a = array (
+	 * 'key1' => array (
+	 * 'key11' => 111
+	 * )
+	 * );
 	 * </pre>
 	 * For example that is a config file.<br>
 	 * Now you want to:
@@ -138,13 +138,13 @@ class AU {
 	 * </pre>
 	 * Using standard PHP approach you will end up with something like this:
 	 * <pre>
-		if(isset($a['a']['b']['c'])){ 
-			$val= $a['a']['b']['c'];
-		}else{
-			$val='default value';
-		}
-		
-		echo $val;
+	 * if(isset($a['a']['b']['c'])){
+	 * $val= $a['a']['b']['c'];
+	 * }else{
+	 * $val='default value';
+	 * }
+	 *
+	 * echo $val;
 	 * </pre>
 	 * As to me -- too much typing.
 	 * Use:
@@ -153,9 +153,10 @@ class AU {
 	 * echo $val;
 	 * </pre>
 	 * This method perfectly works with arbitrary input: <code>null</code>-s etc -- it is safe.
-	 * @param array $data
-	 * @param unknown_type $path
-	 * @param unknown_type $def
+	 *
+	 * @param array $data        	
+	 * @param unknown_type $path        	
+	 * @param unknown_type $def        	
 	 * @return Ambigous <>|unknown|multitype:
 	 */
 	static function get(array &$data, $path, $def = null) {

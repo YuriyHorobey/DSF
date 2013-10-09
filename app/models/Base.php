@@ -120,7 +120,15 @@ class Base {
 	public function lst($where = null, array $where_args = array(), $start = 0, $limit = 50) {
 		$this->clearErrors ();
 		$sql = 'SELECT ' . $this->getFieldNamesAsString () . ' FROM ' . $this->table;
+		$args = array ();
+		if ($start || $limit) {
+			$sql .= ' LIMIT :_start, :_limit';
+			$args ['_start'] = $start;
+			$args ['_limit'] = $limit;
+		}
 		dbg ( $sql );
+		$ret = DB::exec ( $sql, $args );
+		return $ret;
 	}
 	public function show($id) {
 		$this->clearErrors ();

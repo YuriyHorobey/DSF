@@ -169,7 +169,7 @@ class DSF {
 		} catch ( E404 $e ) {
 			RE::renderError ( 404, $e->getMessage () );
 		} catch ( Exception $e ) {
-			dbg ( $e );
+			dbg ( $e , 'DSF in PANIC!');
 		}
 	}
 	/**

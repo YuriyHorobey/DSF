@@ -26,7 +26,7 @@ class RE {
 			$master = AU::get ( $opt, "master", '_' );
 			if ((! is_null ( $master )) && $master !== false) {
 				if ($master === "_" || $master === true) {
-					$master = 'application';
+					$master = 'main';
 				} else {
 					$master = SU::removeBeginning ( trim ( $master ), '/' );
 				}

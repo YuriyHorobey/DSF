@@ -19,7 +19,13 @@ class DB {
 			$username = CFG::get ( 'db/user' );
 			$passwd = CFG::get ( 'db/pass' );
 			$options = CFG::get ( 'db/options' );
-			self::$dbh = new \PDO ( $dsn, $username, $passwd, $options );
+			try {
+				self::$dbh = new \PDO ( $dsn, $username, $passwd, $options );
+			} catch ( \PDOException $e ) {
+				$message = 'Unable to connect to the database:<br>';
+				$message .= $e->getMessage () . '<br>';
+				throw new \E500 ( $message );
+			}
 		}
 	}
 	static function close() {
@@ -38,11 +44,14 @@ class DB {
 		$bind_status = true;
 		foreach ( $params as $parameter => $value ) {
 			$parameter = SU::ensureBeginning ( trim ( $parameter ), ":" );
-			if (is_null ( $value )) {
-				$bind_status = $bind_status && $stmt->bindValue ( $parameter, null, \PDO::PARAM_NULL );
-			} else {
-				$bind_status = $bind_status && $stmt->bindValue ( $parameter, $value );
-			}
+			$type = self::PHPTypeToPDOType ( $value );
+			// if (is_null ( $value )) {
+			// $bind_status = $bind_status && $stmt->bindValue ( $parameter, null, \PDO::PARAM_NULL );
+			// } else {
+			
+			// $bind_status = $bind_status && $stmt->bindValue ( $parameter, $value );
+			// }
+			$bind_status = $bind_status && $stmt->bindValue ( $parameter, $value, $type );
 			if (! $bind_status) {
 				throw new \E500 ( "Unable to prepare query. Parameter '$parameter' can not be bound. The query is: '$sql'" );
 			}
@@ -54,6 +63,30 @@ class DB {
 		}
 		$ret = $stmt->fetchAll ( \PDO::FETCH_ASSOC );
 		return $ret;
+	}
+	public static function PHPTypeToPDOType($var) {
+		$type = gettype ( $var );
+		
+		switch ($type) {
+			case "boolean" :
+				$ret = \PDO::PARAM_BOOL;
+				break;
+			case "double" :
+			case "integer" :
+				$ret = \PDO::PARAM_INT;
+				break;
+			
+			case "string" :
+				$ret = \PDO::PARAM_STR;
+				break;
+			
+			case "NULL" :
+				$ret = \PDO::PARAM_NULL;
+				break;
+			
+			default :
+				break;
+		}
 	}
 	public static function getErrorInfo() {
 		return self::$errorInfo;

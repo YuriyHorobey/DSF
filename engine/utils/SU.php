@@ -84,6 +84,12 @@ class SU {
 	 * @see isEmpty()
 	 */
 	static function isBlank($in) {
+		if (! is_scalar ( $in )) {
+			// TODO rethink this and isEmpty too -- array gives troubles
+			dbg ( $in, "IN" );
+			$e = new \Exception ( 'IN is not String' );
+			dbg ( $e->getTrace (), 'EX' );
+		}
 		return self::isEmpty ( $in ) || preg_match ( '/^\s*$/', $in );
 	}
 	
@@ -198,7 +204,7 @@ class SU {
 	 * Fills "hotspots" from <code>$tpl</code> with values from
 	 * <code>$data</code>.
 	 *
-	 *<p>
+	 * <p>
 	 * Consider this method to be micro templating engine.<br>
 	 * It takes a string from <code>$tpl</code> where are special "hotspots" (by
 	 * default {{<b>key</b> in <code>$data</code>|<b>default value</b>}}),
@@ -211,8 +217,8 @@ class SU {
 	 * <li>else if defaule value is set with the hotspot -- use it</li>
 	 * <li>else -- hotspot is replaced with empty string</li>
 	 * </ol>
- 	 * 
-	 * 
+	 *
+	 *
 	 * @param string $tpl        	
 	 * @param array $data        	
 	 * @return string
