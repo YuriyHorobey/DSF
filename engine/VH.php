@@ -5,6 +5,7 @@ namespace engine;
 use engine\utils\SU;
 use engine\helpers\view\LST;
 use engine\utils\AU;
+use engine\RE;
 
 class VH {
 	protected static $data = array ();
@@ -23,6 +24,7 @@ class VH {
 		self::place ( 'content' );
 	}
 	static function contentFor($name, $content) {
+		RE::contentFor($name, $content);
 	}
 	static function url($url) {
 		$url = trim ( $url );
@@ -70,6 +72,7 @@ class VH {
 	static function LST($name = null) {
 		return new LST ( $name );
 	}
+	
 	static function dget($path, $def = '') {
 		$ret = AU::get ( self::$data, $path, $def );
 		return $ret;

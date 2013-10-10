@@ -84,7 +84,7 @@ class SU {
 	 * @see isEmpty()
 	 */
 	static function isBlank($in) {
-		if (! is_scalar ( $in )) {
+		if (! is_scalar ( $in ) && ! is_null ( $in )) {
 			// TODO rethink this and isEmpty too -- array gives troubles
 			dbg ( $in, "IN" );
 			$e = new \Exception ( 'IN is not String' );

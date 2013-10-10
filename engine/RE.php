@@ -7,19 +7,30 @@ use engine\utils\AU;
 
 /**
  * Class to handle response.
- * @author Yuriy
  *
+ * @author Yuriy
+ *        
  */
 class RE {
 	const TEXT = "_text";
 	const PLACE = "_place";
 	protected static $viewTree = array ();
+	protected static $places = array ();
 	static function invoke($method, $controllerObj, $argVal) {
 		ob_start ();
 		$method->invokeArgs ( $controllerObj, $argVal );
 		
 		$controllerContent = ob_get_clean ();
 		$opt = $controllerObj->getViewOptions ();
+		$redirectURL = AU::get ( $opt, 'redirect', false );
+		if ($redirectURL !== false) {
+			$redirectURL = trim ( $redirectURL );
+			if ($redirectURL === '/' || SU::isBlank ( $redirectURL )) {
+				$redirectURL = APP_URL;
+			}
+			header ( 'Location: ' . $redirectURL );
+			return;
+		}
 		$haveMaster = false;
 		if (\DSF::isRegularRequest ()) {
 			// load master if any
@@ -95,6 +106,7 @@ class RE {
 	}
 	static function addViewNode($type, $contentOrPlaceName) {
 		static $txtNodeCounter = 0;
+		
 		$type = strtolower ( trim ( $type ) );
 		if ($type === self::TEXT) {
 			$txtNodeCounter ++;
@@ -103,7 +115,22 @@ class RE {
 			return;
 		}
 		if ($type == self::PLACE) {
+			$contentOrPlaceName = strtolower ( trim ( $contentOrPlaceName ) );
+			if ($contentOrPlaceName !== 'content') {
+				$placeCnt = AU::get ( self::$places, $contentOrPlaceName, - 1 );
+				$placeCnt ++;
+				self::$places [$contentOrPlaceName] = $placeCnt;
+				$contentOrPlaceName = '_' . $placeCnt . '_' . $contentOrPlaceName;
+			}
 			self::$viewTree [$contentOrPlaceName] = '';
+		}
+	}
+	static function contentFor($name, $content) {
+		$name = strtolower ( trim ( $name ) );
+		$placeCnt = AU::get ( self::$places, $name, - 1 );
+		
+		for($placeIdx = 0; $placeIdx <= $placeCnt; $placeIdx ++) {
+			self::$viewTree ['_' . $placeIdx . '_' . $name] = $content;
 		}
 	}
 	static function renderError($code, $message = "") {

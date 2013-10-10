@@ -163,6 +163,10 @@ class AU {
 		if (self::isEmpty ( $data )) {
 			return $def;
 		}
+		$path = trim ( $path );
+		if ($path === '/') {
+			return $data;
+		}
 		$parts = explode ( "/", $path );
 		$node = &$data;
 		foreach ( $parts as $part ) {
@@ -172,6 +176,9 @@ class AU {
 					
 					$node = &$node [$part];
 				} else {
+					if (is_null ( $node [$part] )) {
+						return $def;
+					}
 					return $node [$part];
 				}
 			} else {

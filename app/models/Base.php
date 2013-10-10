@@ -38,6 +38,9 @@ class Base {
 		
 		return $table;
 	}
+	function getTable() {
+		return $this->table;
+	}
 	protected function field($field_name) {
 		$field_name = trim ( $field_name );
 		$validator = new Validator ( $field_name );
@@ -162,8 +165,8 @@ class Base {
 		$this->clearErrors ();
 		$ret = true;
 		foreach ( $this->rows as $row ) {
-			$id = AU::get ( $row, 'id', false );
-			if ($id === false) {
+			$id = AU::get ( $row, 'id', '' );
+			if (SU::isBlank ( $id )) {
 				$cur = $this->insert ( $row );
 			} else {
 				$cur = $this->update ( $row );

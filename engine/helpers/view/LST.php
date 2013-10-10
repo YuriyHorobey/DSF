@@ -115,6 +115,7 @@ class LST {
 		$this->templateBeingCaptured = false;
 		return $this;
 	}
+	protected function getItems(){}
 	function render($data = '__default__') {
 		if ($data === '__default__' || ! is_array ( $data )) {
 			if (! $this->name) {

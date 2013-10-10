@@ -87,18 +87,7 @@ class DSF {
 		try {
 			self::init ();
 			/*
-			 * lets figure out controller cass / method There are few options 1.
-			 * We use regular controller (no module) So the path can be /c/m
-			 * where c is controller (maybe with namespace /separators: . or -/)
-			 * and 'm' is a method. Both can be optional. So '/' => home/index,
-			 * '/test' => test/index. Then the controller must be in
-			 * /app/controllers/{maybe NS/}SomethingController the ending
-			 * Controller is mandatory. Methods must start with 'do' and must be
-			 * public. underscoers to CamelCase! So /my/something =>
-			 * /app/controllers/MyController::doSomething() 2. the first part is
-			 * 'modules' like /modules/name/c/m -- same rules but initial
-			 * namespace will be modules/name/controllers. in this case the
-			 * second part (the /name/) is mandatory otherwise =>404
+			 * lets figure out controller cass / method There are few options 1. We use regular controller (no module) So the path can be /c/m where c is controller (maybe with namespace /separators: . or -/) and 'm' is a method. Both can be optional. So '/' => home/index, '/test' => test/index. Then the controller must be in /app/controllers/{maybe NS/}SomethingController the ending Controller is mandatory. Methods must start with 'do' and must be public. underscoers to CamelCase! So /my/something => /app/controllers/MyController::doSomething() 2. the first part is 'modules' like /modules/name/c/m -- same rules but initial namespace will be modules/name/controllers. in this case the second part (the /name/) is mandatory otherwise =>404
 			 */
 			$path = $_SERVER ['REQUEST_URI'];
 			$path = substr ( $path, strlen ( APP_URL ) );
@@ -144,13 +133,7 @@ class DSF {
 			$controller [count ( $controller ) - 1] = $class;
 			$controller = $ns . implode ( '\\', $controller );
 			
-			try {
-				$controllerObj = new $controller ();
-			} catch ( E500 $e ) {
-				throw $e;
-			} catch ( Exception $e ) {
-				throw new E404 ();
-			}
+			$controllerObj = new $controller ();
 			
 			$is_call_valid = is_callable ( array (
 					$controllerObj,
@@ -176,12 +159,14 @@ class DSF {
 				RE::invoke ( $method, $controllerObj, $argVal );
 			} else {
 				
-				RE::renderError ( 404 );
+				throw new E404 ();
 			}
-		} catch ( E500 $e ) {
-			RE::renderError ( 500, $e->getMessage () );
 		} catch ( E404 $e ) {
 			RE::renderError ( 404, $e->getMessage () );
+		} catch ( ClassLoaderException $e ) {
+			RE::renderError ( 404, $e->getMessage () );
+		} catch ( E500 $e ) {
+			RE::renderError ( 500, $e->getMessage () );
 		} catch ( Exception $e ) {
 			dbg ( $e, 'DSF in PANIC!' );
 		}
@@ -243,7 +228,7 @@ class DSF {
 	private static function classLoader($what) {
 		$what = str_replace ( '/', '\\', $what );
 		if (! DSF::loadPHP ( $what )) {
-			throw new E500 ( "class '$what' not found" );
+			throw new ClassLoaderException ( $what );
 		}
 	}
 	/**
@@ -351,5 +336,11 @@ class E500 extends \Exception {
 		parent::__construct ( $message, 500, $previous );
 	}
 }
+class ClassLoaderException extends E500 {
+	public function __construct($class) {
+		parent::__construct ( 'Class "' . $class . '" was not found.', null );
+	}
+}
+
 ?>
 

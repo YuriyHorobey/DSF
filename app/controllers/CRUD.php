@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use engine\utils\AU;
 use engine\RE;
+use engine\VH;
 
 class CRUD extends Base {
 	/**
@@ -35,35 +36,39 @@ class CRUD extends Base {
 		echo 'index';
 	}
 	public function doShow($id) {
-		if ($this->model->show ( $id ) !== false) {
-			foreach ( $this->model->getData () as $row ) {
-				echo '<table><tr><td>Field</td><td>Value</td></tr>';
-				foreach ( $row as $filed => $value ) {
-					echo '<tr><td>' . $filed . '</td><td>' . $value . '</td></tr>';
-				}
-				echo '</table>';
-			}
+		$data = $this->model->show ( $id );
+		if ($data !== false) {
+			$data = AU::get ( $data, 0, array () );
+			$this->set ( $this->model->getTable (), $data );
 		} else {
-			dbg ( $this->model->getErrors () );
+			dbg ( $this->model->getErrors (), "CRUD SHOW FAILED" );
 		}
 	}
 	public function doForm($id = null) {
+		if ($id) {
+			$data = $this->model->show ( $id );
+			if ($data !== false) {
+				$data = AU::get ( $data, 0, array () );
+			}
+			$this->set ( $this->model->getTable (), $data );
+		}
 	}
 	public function doSave($id = null) {
-		$table = $this->model->getDefaultTable ();
+		$table = $this->model->getTable ();
 		if (array_key_exists ( $table, $_REQUEST ) && is_array ( $_REQUEST [$table] )) {
 			$this->model->setData ( $_REQUEST [$table] );
 		} else {
 			$this->model->setData ( $_REQUEST );
 		}
 		if (! $this->model->save ()) {
-			dbg ( $this->model->getErrors (), "ERR" );
-			dbg ( $_REQUEST );
-			$this->doForm ( AU::get ( $_REQUEST, 'id' ) );
+			$data = $this->model->getData();
+			$data = AU::get ( $data, 0, array () );
+			$this->set ( $this->model->getTable (), $data );
+			$this->set ( '_errors', $this->model->getErrors () );
 			$this->renderTemplate ( "form" );
 			return;
 		} else {
-			RE::redirect ( 'show' );
+			$this->redirect ( 'show' );
 		}
 	}
 	public function doDelete($id) {

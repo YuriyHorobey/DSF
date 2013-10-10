@@ -1,1 +1,6 @@
-<?php return array();?>
+<?php
+
+return array (
+		'home' => 'home/index' 
+);
+?>
