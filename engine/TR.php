@@ -7,35 +7,38 @@ use engine\utils\AU;
 
 /**
  * Class to handle internatianalization.
- * 
+ *
  * This class is capable to detect language requested, compare it to languages available in your application and offer the best fit.<br>
  * The class offers {@link TR::msg() message translations} too.
+ * 
  * @author Yuriy
- *
+ *        
  */
 class TR {
 	
 	/**
 	 * Flag indicating if {@link TR::init()} was invoked.
 	 * Allows to prevent multiple initialization calls.
+	 * 
 	 * @var boolean $initialized
 	 */
 	protected static $initialized = false;
 	
 	/**
 	 * Current language code.
-	 * 
+	 *
 	 * This is initialized in {@link TR::init() init()} method and stores current language code as defined (<b>case sensitive</b>) in config file.
 	 * See {@link TR::init() init()}
+	 * 
 	 * @var string $code
 	 */
 	protected static $code = 'default';
 	
 	/**
 	 * Available language codes as described in the config file.
-	 * 
+	 *
 	 * See {@link TR::init() init()}
-	 * 
+	 *
 	 * @var array $available
 	 */
 	protected static $available = array ();
@@ -43,15 +46,16 @@ class TR {
 	/**
 	 * Sorted array of user preferred language codes.
 	 * The array contains codes extracted from HTTP_ACCEPT_LANGUAGE and is sorted according to quantifier described here: <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4" target="_blank">rfc2616</a>
+	 * 
 	 * @var array $preferred
 	 */
 	protected static $preferred = array ();
 	
 	/**
 	 * The current dictionary.
-	 * 
+	 *
 	 * The dictionary file is stored at <code>/app/config/locales/&lt;code&gt;.php</code> and is used by {@link TR::msg() msg()} method.
-	 * 
+	 *
 	 * @var array $dict
 	 */
 	protected static $dict = array ();
@@ -61,59 +65,60 @@ class TR {
 	 * <p>
 	 * In order to localize (mainly translate) your application the following should be done:
 	 * <ol>
-	 * <li>Find which language codes user is asking for</li> 
-	 * <li>Compare to language codes we serve and find best match</li> 
-	 * <li>Remember it in session</li> 
-	 * <li>Load appropriate dictionary</li> 
+	 * <li>Find which language codes user is asking for</li>
+	 * <li>Compare to language codes we serve and find best match</li>
+	 * <li>Remember it in session</li>
+	 * <li>Load appropriate dictionary</li>
 	 * </ol>
 	 * The procedure is:
 	 * <ol>
 	 * <li>Find codes user is asking for:
-	 * 		<ol>
-	 * 			<li>Check if request has parameter '_lang'<br>
-	 * 			Usefull if user has clicked language selection controll (like a button with country flag on it)<br>
-	 * 			If yes -- skip to the next step
-	 * 			</li>
-	 * 			<li>If not -- check session for '_lang' key<br>
-	 * 			--Maybe we already know the code?
-	 * 			</li>
-	 * 			<li>If not -- parse <code>HTTP_ACCEPT_LANGUAGE</code> header according to W3C standards (<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4" target="_blank">rfc2616</a>) </li>
-	 * 			<li>If the user is using such a strange browser which is missing this header -- use code under "default" node in config file -- see below </li>
-	 * 		</ol>
+	 * <ol>
+	 * <li>Check if request has parameter '_lang'<br>
+	 * Usefull if user has clicked language selection controll (like a button with country flag on it)<br>
+	 * If yes -- skip to the next step
+	 * </li>
+	 * <li>If not -- check session for '_lang' key<br>
+	 * --Maybe we already know the code?
+	 * </li>
+	 * <li>If not -- parse <code>HTTP_ACCEPT_LANGUAGE</code> header according to W3C standards (<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4" target="_blank">rfc2616</a>) </li>
+	 * <li>If the user is using such a strange browser which is missing this header -- use code under "default" node in config file -- see below </li>
+	 * </ol>
 	 * </li>
 	 * <li>Check what is available:
-	 * 		<ol>
-	 * 			<li>In the config file you must have the following:
-	 * 			<pre>
-  		'locales' => array (
-			'default' => 'en',
-			'available' => array (
-					'uk',
-					'en',
-					'en-US', 
-			) 
-		) 
-	 * 			</pre>
-	 * 			</li>
-	 * 			<li>Compare with the codes requested.<br>
-	 * 				<b>The comparison is case insensitive.</b> If you have defined that "en-US" is available and user asked for "en-us" or "EN-us" -- we will answer "yes, we have it"<br>
-	 * 				<b>BUT!</b> the language code returned to the application will be just exactly as you have specified in the config file: "en-US".<br>
-	 * 				Since the code will be used to load dictionary ("en-US.php") and the code can be part of a {@link TR::getCodeAsPath() file path} -- remember that Linux and some other OS-es
-	 * 				have case sensitive file system.
-	 * 			</li>
-	 * 			<li>If user has asked for "en-AU", but we have just "en" -- it will be used</li>
-	 * 			<li>If user has asked for language we don't serve -- the value from "locales/default" config node will be used</li>
-	 * 			<li>If you have missed the "default" -- the first one from "available" will be used</li>
-	 * 		</ol>
-	 * 		This class does not check if you actually have the dictionary, or if you have appropriate folders with localized Views, etc; 
-	 * 		-- if you stated in config file that "some-Code" is available, -- TR respects that, so 
-	 * 		-- first translate everything, then put it under "available"
+	 * <ol>
+	 * <li>In the config file you must have the following:
+	 * <pre>
+	 * 'locales' => array (
+	 * 'default' => 'en',
+	 * 'available' => array (
+	 * 'uk',
+	 * 'en',
+	 * 'en-US',
+	 * )
+	 * )
+	 * </pre>
+	 * </li>
+	 * <li>Compare with the codes requested.<br>
+	 * <b>The comparison is case insensitive.</b> If you have defined that "en-US" is available and user asked for "en-us" or "EN-us" -- we will answer "yes, we have it"<br>
+	 * <b>BUT!</b> the language code returned to the application will be just exactly as you have specified in the config file: "en-US".<br>
+	 * Since the code will be used to load dictionary ("en-US.php") and the code can be part of a {@link TR::getCodeAsPath() file path} -- remember that Linux and some other OS-es
+	 * have case sensitive file system.
+	 * </li>
+	 * <li>If user has asked for "en-AU", but we have just "en" -- it will be used</li>
+	 * <li>If user has asked for language we don't serve -- the value from "locales/default" config node will be used</li>
+	 * <li>If you have missed the "default" -- the first one from "available" will be used</li>
+	 * </ol>
+	 * This class does not check if you actually have the dictionary, or if you have appropriate folders with localized Views, etc;
+	 * -- if you stated in config file that "some-Code" is available, -- TR respects that, so
+	 * -- first translate everything, then put it under "available"
 	 * </li>
 	 * <li>Attempt to load dictionary using {@link DSF::loadPHP()}.</li>
 	 * <li>Store the language code (just as told above -- case sensitive, exactly as specified in the config) into the session</li>
 	 * </ol>
-	 * The initialization happens only once per request. Although this method is public -- you do not need to call it explicitly -- every method has 
+	 * The initialization happens only once per request. Although this method is public -- you do not need to call it explicitly -- every method has
 	 * <code>self::init()</code> at the first line, so this class is initialized only when needed. (haven't called {@link TR::msg() msg()}? --no need to parse the request nor to spent resources to load the dictionary)
+	 * 
 	 * @return void
 	 */
 	public static function init() {
@@ -133,7 +138,7 @@ class TR {
 		}
 		
 		if (isset ( $_SERVER ['HTTP_ACCEPT_LANGUAGE'] )) {
-			
+			$lang_parse = array ();
 			// break up string into pieces (languages and q factors)
 			preg_match_all ( '/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER ['HTTP_ACCEPT_LANGUAGE'], $lang_parse );
 			
@@ -196,6 +201,7 @@ class TR {
 	}
 	/**
 	 * Returns current language code.
+	 * 
 	 * @return string
 	 */
 	public static function getCode() {
@@ -204,8 +210,9 @@ class TR {
 	}
 	/**
 	 * Returns current language code to be used as part of file path.
-	 * 
+	 *
 	 * If {@link self::$code code} {@link SU::isBlank() is blank} returns empty string, otherwise prependes the directory separator to it.
+	 * 
 	 * @return string
 	 */
 	public static function getCodeAsPath() {
@@ -216,8 +223,9 @@ class TR {
 		}
 	}
 	/**
-	 * Returns available language codes (if any) from config file. 
-	 * @return array language codes defined in config file 
+	 * Returns available language codes (if any) from config file.
+	 *
+	 * @return array language codes defined in config file
 	 */
 	public static function getAvailable() {
 		self::init ();
@@ -226,11 +234,11 @@ class TR {
 	}
 	/**
 	 * Returns language code preferred by current user.
-	 * 
+	 *
 	 * What is preferred by the user is not what is actually in use.<br>
-	 * This class tries its best to offer maximum compatible language with that prefered by the user; 
+	 * This class tries its best to offer maximum compatible language with that prefered by the user;
 	 * but if user asked for "fr" and we have no "fr", the default one will be used (see tutorials).<br>
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getPreferred() {
@@ -239,27 +247,27 @@ class TR {
 	}
 	/**
 	 * Translate <code>$key</code> into curent language.
-	 * 
+	 *
 	 * In order to translate a message, this method is using dictionary files in the followinf format:
-	 * 
+	 *
 	 * <pre>
 	 * &lt;?php
-
-			return array (
-					'database' => array (
-							'not_connected' => 'Wrong login/password for the database',
-							'sql_error' => 'There is error in your sql {{{@link SU::tpl() msg}}}' 
-					),
-					'some' => array (
-							'deep' => array (
-									'nested' => array (
-											'message' => 'Say something' 
-									) 
-							) 
-					) 
-			);
-		?&gt;
-	 * 
+	 *
+	 * return array (
+	 * 'database' => array (
+	 * 'not_connected' => 'Wrong login/password for the database',
+	 * 'sql_error' => 'There is error in your sql {{{@link SU::tpl() msg}}}'
+	 * ),
+	 * 'some' => array (
+	 * 'deep' => array (
+	 * 'nested' => array (
+	 * 'message' => 'Say something'
+	 * )
+	 * )
+	 * )
+	 * );
+	 * ?&gt;
+	 *
 	 * </pre>
 	 * The dictionary is located in <code>/app/config/locales/&lt;language code&gt;.php</code> file.
 	 * (maybe in future I will add possibility to load arbitrary dictionaries, but is it really needed?)<br>
@@ -271,9 +279,12 @@ class TR {
 	 * </pre>
 	 * If <code>$key</code> is not found in the current dictionary, it will be returned as is.<br>
 	 * If the <code>$key</code> is found -- it will be passed through {@link SU::tpl()} with <code>$vars</code>
-	 * @param string $key path in the current dictionary
-	 * @param array $vars optional data to be inserted into the translated string
-	 * @return   string  translated string or <code>$key</code> if not found
+	 * 
+	 * @param string $key
+	 *        	path in the current dictionary
+	 * @param array $vars
+	 *        	optional data to be inserted into the translated string
+	 * @return string translated string or <code>$key</code> if not found
 	 * @see SU::tpl()
 	 */
 	public static function msg($key, $vars = array()) {

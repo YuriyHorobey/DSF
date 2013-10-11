@@ -33,7 +33,8 @@ class CRUD extends Base {
 		return $this->model;
 	}
 	public function doIndex() {
-		echo 'index';
+		$data = $this->model->lst ();
+		$this->set ( $this->model->getTable (), $data );
 	}
 	public function doShow($id) {
 		$data = $this->model->show ( $id );
@@ -61,7 +62,7 @@ class CRUD extends Base {
 			$this->model->setData ( $_REQUEST );
 		}
 		if (! $this->model->save ()) {
-			$data = $this->model->getData();
+			$data = $this->model->getData ();
 			$data = AU::get ( $data, 0, array () );
 			$this->set ( $this->model->getTable (), $data );
 			$this->set ( '_errors', $this->model->getErrors () );
