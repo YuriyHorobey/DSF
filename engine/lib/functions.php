@@ -21,13 +21,9 @@ function dbg($var = null, $lbl = "dbg", $detailed = true) {
 		echo "---\n";
 		if (isset ( $stack [0] ["file"] )) {
 			$file = str_replace ( "\\", "/", $stack [0] ["file"] );
-			// $root = trim ( $CFG ["app_root"] );
-			$root = realpath ( __DIR__ . "/../" );
-			$root = rtrim ( $root, "/" );
-			$root = rtrim ( $root, "\\" );
-			$root = realpath ( $root . "/../" );
-			$root = str_replace ( "\\", "/", $root );
-			$file = substr ( $file, strlen ( $root ) ) . ": ";
+			if (defined ( 'APP_ROOT' )) {
+				$file = substr ( $file, strlen ( APP_ROOT ) ) . ": "; 
+			}
 			echo $file;
 		}
 		if (isset ( $stack [1] ["class"] )) {
