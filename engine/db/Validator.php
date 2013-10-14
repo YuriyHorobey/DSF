@@ -31,7 +31,7 @@ class Validator {
 	}
 	protected function addError($err, $args = array()) {
 		$args ['field_name'] = $this->field_name;
-		$this->errors [] = SU::tpl ( $err, $args );
+		$this->errors []['_msg'] = SU::tpl ( $err, $args );
 	}
 	public function isValid() {
 		if ($this->validated == false) {

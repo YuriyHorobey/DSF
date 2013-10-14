@@ -115,21 +115,7 @@ class LST {
 		$this->templateBeingCaptured = false;
 		return $this;
 	}
-	protected function getItems(){}
-	function render($data = '__default__') {
-		if ($data === '__default__' || ! is_array ( $data )) {
-			if (! $this->name) {
-				throw new LSTException ( 'Unable to render list. Neither name, nor data is given' );
-			}
-			$data = VH::dget ( $this->name, array () );
-		}
-		$rows = AU::extractIndexed ( $data );
-		if (count ( $rows ) == 0) {
-			echo SU::tpl ( $this->empty, $data );
-			return $this;
-		}
-		
-		echo SU::tpl ( $this->header, $data );
+	protected function getItems($rows) {
 		$items = '';
 		for($_idx = 0; $_idx < count ( $rows ); $_idx ++) {
 			$row = $rows [$_idx];
@@ -145,6 +131,30 @@ class LST {
 			}
 			$items .= SU::tpl ( $this->item, $row );
 		}
+		return $items;
+	}
+	protected function getData($data) {
+		if ($data === '__default__' || ! is_array ( $data )) {
+			if (! $this->name) {
+				throw new LSTException ( 'Unable to render list. Neither name, nor data is given' );
+			}
+			$data = VH::dget ( $this->name, array () );
+		}
+		return $data;
+	}
+	function render($data = '__default__') {
+		$data = $this->getData ( $data );
+		if ($this->name) {
+			$data ['_name'] = $this->name;
+		}
+		$rows = AU::extractIndexed ( $data );
+		if (count ( $rows ) == 0) {
+			echo SU::tpl ( $this->empty, $data );
+			return $this;
+		}
+		
+		echo SU::tpl ( $this->header, $data );
+		$items = $this->getItems ( $rows );
 		echo $items;
 		echo SU::tpl ( $this->footer, $data );
 	}
